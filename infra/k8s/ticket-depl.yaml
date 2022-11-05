@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ticket-depl
+spec:
+  selector:
+    matchLabels:
+      app: ticket
+  template:
+    metadata:
+      labels:
+        app: ticket
+    spec:
+      containers:
+      - name: ticket
+        image: turkmenbey/ticket-best
+        env:
+          - name: NATS_URI
+            value: 'http://nats-srv:4222'
+          - name: NATS_CLUSTER_ID
+            value: microbest
+          - name: NATS_CLIENT_ID
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: JWT_KEY
+            valueFrom:
+              secretKeyRef:
+                name: jwt-secret-best
+                key: JWT_KEY
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ticket-srv
+spec:
+  selector:
+    app: ticket
+  ports:
+  - name: ticket
+    protocol: TCP
+    port: 5002
+    targetPort: 5002

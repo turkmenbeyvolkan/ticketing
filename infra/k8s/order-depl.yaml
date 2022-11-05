@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-depl
+spec:
+  selector:
+    matchLabels:
+      app: order
+  template:
+    metadata:
+      labels:
+        app: order
+    spec:
+      containers:
+      - name: order
+        image: turkmenbey/order-best
+        env:
+          - name: NATS_URI
+            value: 'http://nats-srv:4222'
+          - name: NATS_CLUSTER_ID
+            value: microbest
+          - name: NATS_CLIENT_ID
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: JWT_KEY
+            valueFrom:
+              secretKeyRef:
+                name: jwt-secret-best
+                key: JWT_KEY
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-srv
+spec:
+  selector:
+    app: order
+  ports:
+  - name: order
+    protocol: TCP
+    port: 5003
+    targetPort: 5003
