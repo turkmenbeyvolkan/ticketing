@@ -4,6 +4,7 @@ import { DatabaseConnectionError } from "@tv_best/common";
 import {app} from "./app";
 
 const start=()=>{
+    console.log("pull request ex")
     if(!process.env.JWT_KEY){
         throw new Error("You must define JWT KEY")
     }
